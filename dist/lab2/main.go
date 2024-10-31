@@ -39,6 +39,7 @@ func worker(id int, taskChan <-chan Task, doneChan, failChan chan<- Task) {
 		doneChan <- task
 		logrus.WithFields(logrus.Fields{"worker_id": id, "task_id": task.id}).Info("Worker completed task")
 	}
+	logrus.WithFields(logrus.Fields{"worker_id": id}).Info("Worker channel is closed and worker is shutting down")
 }
 
 func loadBalancer(numWorkers int, taskChan <-chan Task, doneChan, failChan chan<- Task) {
@@ -63,6 +64,7 @@ func loadBalancer(numWorkers int, taskChan <-chan Task, doneChan, failChan chan<
 		workerChan <- task
 		next_worker_id = (next_worker_id + 1) % numWorkers
 	}
+	logrus.Info("All tasks have been processed. Shutting down load balancer.")
 }
 
 func main() {
@@ -123,13 +125,12 @@ func main() {
 		}
 	}()
 
-	go func() {
-		wg.Wait()
+	wg.Wait()
+
+	defer func() {
 		close(taskChan)
 		close(failChan)
 		close(doneChan)
-		logrus.Info("All tasks have been processed. Shutting down.")
+		logrus.Info("All tasks have been processed. Shutting down main.")
 	}()
-
-	wg.Wait()
 }
