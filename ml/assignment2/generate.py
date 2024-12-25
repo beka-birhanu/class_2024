@@ -1,9 +1,15 @@
 import pandas as pd
 import random
+import os
+import kaggle
+
+kaggle.api.authenticate()
+
+kaggle.api.dataset_download_files('nikhil7280/weather-type-classification', path=os.getcwd(), unzip=True)
+
 
 # Read the input CSV file
-input_file = "weather_data.csv"  
-df = pd.read_csv(input_file)
+df = pd.read_csv("weather_classification_data.csv")
 
 # Define criteria for Good/Bad weather
 def classify_weather(row):
@@ -29,8 +35,6 @@ def probabilistic_classify(row):
 df["Good/Bad"] = df.apply(probabilistic_classify, axis=1)
 
 # Save the updated DataFrame to a new CSV file
-output_file = "generated_weather_data.csv"  # Path to save the new CSV file
-df.to_csv(output_file, index=False)
-
-print(f"File saved to {output_file}")
+df.to_csv("generated_weather_data.csv", index=False)
+print("File saved to generated_weather_data.csv")
 

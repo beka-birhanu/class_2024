@@ -5,3 +5,4 @@ matplotlib
 seaborn
 pyqt5 
 numpy
+kaggle
